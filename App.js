@@ -4,38 +4,39 @@ import NFTForm from './NFTForm';
 import NFTList from './NFTList';
 
 const MainComponent = () => {
-  const [userAddress, setUserAddress] = useState('');
-  const [nftData, setNftData] = useState([]);
+  const [walletAddress, setWalletAddress] = useState('');
+  const [nftCollection, setNftCollection] = useState([]);
 
   useEffect(() => {
-    const getConnection = () => {
-      const solanaNetwork = process.env.REACT_APP_SOLANA_NETWORK || 'devnet';
-      return new Connection(clusterApiUrl(solanaNetwork), 'confirmed');
+    const establishConnection = () => {
+      const solNetwork = process.env.REACT_APP_SOLANA_NETWORK || 'devnet';
+      return new Connection(clusterApiUrl(solNetwork), 'confirmed');
     }
 
-    const checkWalletConnection = async () => {
+    const verifyWalletConnection = async () => {
       try {
-        const connection = getConnection();
-        console.log(`Connected to ${connection.rpcEndpoint}`);
-        setUserAddress('YOUR_SOLANA_ADDRESS_HERE');
+        const solanaConnection = establishConnection();
+        console.log(`Connected to ${solanaConnection.rpcEndpoint}`);
+        // Reminder: Replace 'YOUR_SOLANA_ADDRESS_HERE' with dynamic fetching logic if needed
+        setWalletAddress('YOUR_SOLANA_ADDRESS_HERE');
       } catch (error) {
-        console.error("Error connecting to Solana network:", error);
+        console.error("Error connecting to the Solana network:", error);
       }
     };
 
-    checkWalletConnection();
+    verifyWalletConnection();
   }, []);
 
-  const handleNewNFTData = (newData) => {
-    setNftData((prevData) => [...prevData, newData]);
+  const appendNFTData = (newNftData) => {
+    setNftCollection((currentNftCollection) => [...currentNftCollection, newNftData]);
   }
 
   return (
     <div>
       <h1>NFT Tracker Application</h1>
-      <p>Your Solana address: {userAddress}</p>
-      <NFTForm onNewNFTData={handleNewNFTData} />
-      <NFTList nftData={nftData} />
+      <p>Your Solana address: {walletAddress}</p>
+      <NFTForm onNewNFTData={appendNFTData} />
+      <NFTList nftData={nftCollection} />
     </div>
   );
 };
