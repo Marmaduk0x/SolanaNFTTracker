@@ -4,10 +4,42 @@ const trackCollectionAndWallets = (collectionAddress, walletAddresses) => {
   console.log(`Tracking collection: ${collectionAddress} for wallets:`, walletAddresses);
 };
 
+const WalletAddressesInput = ({ onAdd }) => {
+  const [walletAddressInput, setWalletAddressInput] = useState('');
+
+  const handleAddClick = () => {
+    onAdd(walletAddressInput);
+    setWalletAddressInput(''); // Clear input after adding
+  };
+
+  return (
+    <div>
+      <label>Wallet Address:</label>
+      <input
+        type="text"
+        value={walletAddressInput}
+        onChange={(e) => setWalletAddressInput(e.target.value)}
+        placeholder="Enter wallet address"
+      />
+      <button type="button" onClick={handleAddClick}>Add to list</button>
+    </div>
+  );
+};
+
+const WalletAddressesList = ({ addresses }) => (
+  <div>
+    <h4>Wallet Addresses to track:</h4>
+    <ul>
+      {addresses.map((address, index) => (
+        <li key={index}>{address}</li>
+      ))}
+    </ul>
+  </div>
+);
+
 const NFTTrackingForm = () => {
   const [collectionAddress, setCollectionAddress] = useState('');
   const [walletAddresses, setWalletAddresses] = useState([]);
-  const [walletAddressInput, setWalletAddressInput] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,13 +50,11 @@ const NFTTrackingForm = () => {
     trackCollectionAndWallets(collectionAddress, walletAddresses);
     setCollectionAddress('');
     setWalletAddresses([]);
-    setWalletAddressInput('');
   };
 
-  const handleAddWalletAddress = () => {
-    if (walletAddressInput && !walletAddresses.includes(walletAddressInput)) {
-      setWalletAddresses([...walletAddresses, walletAddressInput]);
-      setWalletAddressInput('');
+  const handleAddWalletAddress = (walletAddress) => {
+    if (walletAddress && !walletAddresses.includes(walletAddress)) {
+      setWalletAddresses([...walletAddresses, walletAddress]);
     }
   };
 
@@ -32,33 +62,15 @@ const NFTTrackingForm = () => {
     <form onSubmit={handleSubmit}>
       <div>
         <label>Collection Address:</label>
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={collectionAddress}
           onChange={(e) => setCollectionAddress(e.target.value)}
           placeholder="Enter collection address"
         />
       </div>
-      <div>
-        <label>Wallet Address:</label>
-        <input
-          type="text"
-          value={walletAddressInput}
-          onChange={(e) => setWalletAddressInput(e.target.value)}
-          placeholder="Enter wallet address"
-        />
-        <button type="button" onClick={handleAddWalletAddress}>Add to list</button>
-      </div>
-      {walletAddresses.length > 0 &&
-        <div>
-          <h4>Wallet Addresses to track:</h4>
-          <ul>
-            {walletAddresses.map((address, index) => (
-              <li key={index}>{address}</li>
-            ))}
-          </ul>
-        </div>
-      }
+      <WalletAddressesInput onAdd={handleAddWalletAddress} />
+      {walletAddresses.length > 0 && <WalletAddressesList addresses={walletAddresses} />}
       <button type="submit">Track Collection & Wallets</button>
     </form>
   );
