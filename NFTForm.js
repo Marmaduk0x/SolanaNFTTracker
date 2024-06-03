@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 
-const trackCollectionAndWallets = (collectionAddress, walletAddresses) => {
-  console.log(`Tracking collection: ${collectionAddress} for wallets:`, walletAddresses);
+const trackNFTCollectionForWallets = (NFTCollectionAddress, walletAddressesList) => {
+  console.log(`Tracking NFT collection: ${NFTCollectionAddress} for wallets:`, walletAddressesList);
 };
 
-const WalletAddressesInput = ({ onAdd }) => {
-  const [walletAddressInput, setWalletAddressInput] = useState('');
+const WalletAddressInputForm = ({ onAddWallet }) => {
+  const [inputWalletAddress, setInputWalletAddress] = useState('');
 
-  const handleAddClick = () => {
-    onAdd(walletAddressInput);
-    setWalletAddressInput(''); // Clear input after adding
+  const handleAddButtonClick = () => {
+    onAddWallet(inputWalletAddress);
+    setInputWalletAddress(''); // Clear input after adding
   };
 
   return (
@@ -17,63 +17,63 @@ const WalletAddressesInput = ({ onAdd }) => {
       <label>Wallet Address:</label>
       <input
         type="text"
-        value={walletAddressInput}
-        onChange={(e) => setWalletAddressInput(e.target.value)}
+        value={inputWalletAddress}
+        onChange={(e) => setInputWalletAddress(e.target.value)}
         placeholder="Enter wallet address"
       />
-      <button type="button" onClick={handleAddClick}>Add to list</button>
+      <button type="button" onClick={handleAddButtonClick}>Add to list</button>
     </div>
   );
 };
 
-const WalletAddressesList = ({ addresses }) => (
+const WalletAddressesDisplay = ({ walletList }) => (
   <div>
     <h4>Wallet Addresses to track:</h4>
     <ul>
-      {addresses.map((address, index) => (
+      {walletList.map((address, index) => (
         <li key={index}>{address}</li>
       ))}
     </ul>
   </div>
 );
 
-const NFTTrackingForm = () => {
-  const [collectionAddress, setCollectionAddress] = useState('');
-  const [walletAddresses, setWalletAddresses] = useState([]);
+const NFTTrackingController = () => {
+  const [NFTCollectionAddress, setNFTCollectionAddress] = useState('');
+  const [trackedWalletAddresses, setTrackedWalletAddresses] = useState([]);
 
-  const handleSubmit = (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (!collectionAddress || walletAddresses.length === 0) {
-      alert('Please fill in both the collection address and at least one wallet address.');
+    if (!NFTCollectionAddress || trackedWalletAddresses.length === 0) {
+      alert('Please fill in both the NFT collection address and at least one wallet address.');
       return;
     }
-    trackCollectionAndWallets(collectionAddress, walletAddresses);
-    setCollectionAddress('');
-    setWalletAddresses([]);
+    trackNFTCollectionForWallets(NFTCollectionAddress, trackedWalletAddresses);
+    setNFTCollectionAddress('');
+    setTrackedWalletAddresses([]);
   };
 
-  const handleAddWalletAddress = (walletAddress) => {
-    if (walletAddress && !walletAddresses.includes(walletAddress)) {
-      setWalletAddresses([...walletAddresses, walletAddress]);
+  const addWalletAddressToList = (newWalletAddress) => {
+    if (newWalletAddress && !trackedWalletAddresses.includes(newWalletAddress)) {
+      setTrackedWalletAddresses([...trackedWalletAddresses, newWalletAddress]);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleFormSubmit}>
       <div>
         <label>Collection Address:</label>
         <input
           type="text"
-          value={collectionAddress}
-          onChange={(e) => setCollectionAddress(e.target.value)}
-          placeholder="Enter collection address"
+          value={NFTCollectionAddress}
+          onChange={(e) => setNFTCollectionAddress(e.target.value)}
+          placeholder="Enter NFT collection address"
         />
       </div>
-      <WalletAddressesInput onAdd={handleAddWalletAddress} />
-      {walletAddresses.length > 0 && <WalletAddressesList addresses={walletAddresses} />}
-      <button type="submit">Track Collection & Wallets</button>
+      <WalletAddressInputForm onAddWallet={addWalletAddressToList} />
+      {trackedWalletAddresses.length > 0 && <WalletAddressesDisplay walletList={trackedWalletAddresses} />}
+      <button type="submit">Track NFT Collection & Wallets</button>
     </form>
   );
 };
 
-export default NFTTrackingForm;
+export default NFTTrackingController;
