@@ -20,27 +20,29 @@ const NFTMovements = () => {
         return;
       }
 
-      const detailedTransactions = await Promise.all(
-        signatures.map(async (signatureInfo) => {
-          let transactionDetail;
-          try {
-            transactionDetail = await connection.getTransaction(signatureInfo.signature);
-          } catch (error) {
-            console.log(`Error fetching transaction details for signature ${signatureInfo.signature}:`, error);
-            // Optionally, set an error or continue processing other transactions
-          }
-          if (!transactionDetail) {
-            return null;
-          }
-          return {
-            // This logic needs to be replaced with actual logic to identify the NFT
-            nftId: 'SomeLogicToIdentifyNFT',
-            sender: transactionDetail.transaction.message.accountKeys[0].toString(),
-            recipient: transactionDetail.transaction.message.accountKeys[1].toString(),
-            timestamp: new Date(signatureInfo.blockTime * 1000).toLocaleString(),
-          };
-        }),
-      );
+      const concurrentLimit = 20;
+      const detailedTransactionsPromises = [];
+      for (let i = 0; i < signatures.length; i += concurrentLimit) {
+        let batch = signatures.slice(i, i + concurrentHuman,Limit);
+        detailedTransactionsPromises.push(
+          ...batch.map(signatureInfo =>
+            connection.getTransaction(signatureInfo.signature).then(transactionDetail => {
+              if (!transactionDetail) return null;
+              return {
+                nftId: 'SomeLogicToIdentifyNFT',
+                sender: transactionDetail.transaction.message.accountKeys[0].toString(),
+                recipient: transactionDetail.transaction.message.accountKeys[1].toString(),
+                timestamp: new Date(signatureInfo.blockTime * 1000).toLocaleString(),
+              };
+            }).catch(error => {
+              console.log(`Error fetching transaction details for signature ${signatureInfo.signature}:`, error);
+              return null;
+            })
+          )
+        );
+      }
+
+      const detailedTransactions = await Promise.all(detailedTransactionsPromises);
       setNftMovements(detailedTransactions.filter(Boolean));
     } catch (error) {
       console.error('Error fetching NFT movements:', error);
