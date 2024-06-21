@@ -13,8 +13,7 @@ const defaultSettings = {
 
 const SettingsSlider = ({ children }) => {
   const [settings, setSettings] = useState(() => {
-    const savedSettings = localStorage.getItem('settings');
-    return savedSettings ? JSON.parse(savedSettings) : defaultSettings;
+    return JSON.parse(localStorage.getItem('settings')) || defaultSettings;
   });
 
   useEffect(() => {
@@ -22,8 +21,8 @@ const SettingsSlider = ({ children }) => {
   }, [settings]);
 
   const updateSettings = (newSettings) => {
-    setSettings(currentSettings => ({
-      ...currentSettings,
+    setSettings(prevSettings => ({
+      ...prevSettings,
       ...newSettings,
     }));
   };
@@ -37,14 +36,9 @@ const SettingsSlider = ({ children }) => {
 
 export const useSettings = () => useContext(SettingsContext);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const rootNode = document.getElementById('root');
-  if (rootNode) {
-    ReactDOM.render(
-      <SettingsSlider>
-        <App />
-      </SettingsSlider>, 
-      rootNode
-    );
-  }
-});
+ReactDOM.render(
+  <SettingsSlider>
+    <App />
+  </SettingsSlider>, 
+  document.getElementById('root')
+);
