@@ -9,6 +9,7 @@ const defaultSettings = {
   theme: 'light',
   language: 'en',
   notifications: true,
+  network: 'mainnet',
 };
 
 const SettingsSlider = ({ children }) => {
@@ -27,8 +28,15 @@ const SettingsSlider = ({ children }) => {
     }));
   };
 
+  const toggleTheme = () => {
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      theme: prevSettings.theme === 'light' ? 'dark' : 'light',
+    }));
+  };
+
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings }}>
+    <SettingsContext.Provider value={{ settings, updateSettings, toggleTheme }}>
       {children}
     </SettingsContext.Provider>
   );
