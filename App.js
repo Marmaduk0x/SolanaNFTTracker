@@ -3,42 +3,30 @@ import { Connection, clusterApiUrl } from '@solana/web3.js';
 import NFTForm from './NFTForm';
 import NFTList from './NFTList';
 
-const connectionCache = {
-  instance: null,
-  getLastInstance: function() {
-    if (!this.instance) {
+const getConnectionInstance = (() => {
+  let instance = null;
+  return () => {
+    if (!instance) {
       const solNetwork = process.env.REACT_APP_SOLANA_NETWORK || 'devnet';
-      this.instance = new Connection(clusterApiUrl(solNetwork), 'confirmed');
+      instance = new Connection(clusterApiUrl(solNetwork), 'confirmed');
     }
-    return this.instance;
-  }
-};
+    return instance;
+  };
+})();
 
 const MainComponent = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [nftCollection, setNftCollection] = useState([]);
 
-  const establishConnection = useCallback(() => {
-    return connectionCache.getLastInstance();
-  }, []); 
-
   useEffect(() => {
-    const verifyWalletConnection = async () => {
-      try {
-        const solanaConnection = establishConnection();
-        console.log(`Connected to ${solanaConnection.rpcEndpoint}`);
-        setWalletAddress('YOUR_SOLANA_ADDRESS_HERE');
-      } catch (error) {
-        console.error("Error connecting to the Solana network:", error);
-      }
-    };
-
-    verifyWalletConnection();
-  }, [establishConnection]);
+    const solanaConnection = getConnectionInstance();
+    console.log(`Connected to ${solanaConnection.rpcEndpoint}`);
+    setWalletAddress('YOUR_SOLANA_ADDRESS_HERE');
+  }, []);
 
   const appendNFTData = useCallback((newNftData) => {
     setNftCollection((currentNftCollection) => [...currentNftCollection, newNftData]);
-  }, []); 
+  }, []);
 
   return (
     <div>
